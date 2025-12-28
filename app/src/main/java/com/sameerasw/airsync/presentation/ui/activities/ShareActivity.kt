@@ -69,6 +69,7 @@ class ShareActivity : ComponentActivity() {
                             context = this@ShareActivity,
                             ipAddress = ipAddress,
                             port = port,
+                            name = lastConnectedDevice?.name,
                             symmetricKey = symmetricKey,
                             manualAttempt = true,
                             onHandshakeTimeout = {
@@ -126,6 +127,7 @@ class ShareActivity : ComponentActivity() {
                         context = this@ShareActivity,
                         ipAddress = ipAddress,
                         port = port,
+                        name = lastConnectedDevice?.name,
                         symmetricKey = symmetricKey,
                         manualAttempt = true,
                         onHandshakeTimeout = {

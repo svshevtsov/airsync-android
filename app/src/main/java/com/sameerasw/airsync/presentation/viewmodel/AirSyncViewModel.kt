@@ -549,6 +549,7 @@ class AirSyncViewModel(
                                         context = context,
                                         ipAddress = target.ipAddress,
                                         port = target.port.toIntOrNull() ?: 6996,
+                                        name = target.name,
                                         symmetricKey = target.symmetricKey,
                                         manualAttempt = false,
                                         onConnectionStatus = { connected ->

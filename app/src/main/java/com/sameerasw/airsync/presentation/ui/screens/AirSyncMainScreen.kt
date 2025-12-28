@@ -122,6 +122,7 @@ fun AirSyncMainScreen(
             context = context,
             ipAddress = uiState.ipAddress,
             port = uiState.port.toIntOrNull() ?: 6996,
+            name = uiState.lastConnectedDevice?.name,
             symmetricKey = uiState.symmetricKey,
             manualAttempt = true,
             onHandshakeTimeout = {

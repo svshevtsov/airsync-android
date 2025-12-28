@@ -67,6 +67,7 @@ object WebSocketUtil {
         ipAddress: String,
         port: Int,
         symmetricKey: String?,
+        name: String? = null,
         onConnectionStatus: ((Boolean) -> Unit)? = null,
         onMessage: ((String) -> Unit)? = null,
         // Distinguish between manual user triggered connections and auto reconnect attempts
@@ -117,8 +118,15 @@ object WebSocketUtil {
                     client = createClient()
                 }
 
+                // Try mDNS (.local) first if name is set and we're not in fallback mode
+                val host = if (!name.isNullOrEmpty()) {
+                    "$name.local"
+                } else {
+                    ipAddress
+                }
+
                 // Always use ws:// for local network
-                val url = "ws://$ipAddress:$port/socket"
+                val url = "ws://$host:$port/socket"
 
                 Log.d(TAG, "Connecting to $url")
 
@@ -244,12 +252,30 @@ object WebSocketUtil {
                     }
 
                     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                        Log.e(TAG, "WebSocket connection failed: ${t.message}")
+                        Log.e(TAG, "WebSocket connection to $url failed: ${t.message}")
+
                         isConnected.set(false)
                         isConnecting.set(false)
                         isSocketOpen.set(false)
                         handshakeCompleted.set(false)
                         handshakeTimeoutJob?.cancel()
+
+                        // If we were trying mDNS (.local) and it failed, retry with IP address
+                        if (!name.isNullOrEmpty()) {
+                            Log.d(TAG, "mDNS connection to $name.local failed, falling back to IP address $ipAddress")
+                            // Retry with IP address as fallback
+                            connect(
+                                context = context,
+                                ipAddress = ipAddress,
+                                port = port,
+                                symmetricKey = symmetricKey,
+                                onConnectionStatus = onConnectionStatus,
+                                onMessage = onMessage,
+                                manualAttempt = manualAttempt,
+                                onHandshakeTimeout = onHandshakeTimeout,
+                            )
+                            return
+                        }
 
                         // Stop AirSync service on failure
                         try {
@@ -281,6 +307,21 @@ object WebSocketUtil {
                 handshakeTimeoutJob?.cancel()
                 onConnectionStatusChanged?.invoke(false)
                 try { NotificationUtil.clearContinueBrowsingNotifications(context) } catch (_: Exception) {}
+
+                if (!name.isNullOrEmpty()) {
+                    Log.d(TAG, "mDNS connection to $name.local failed, falling back to IP address $ipAddress")
+                    // Retry with IP address as fallback
+                    connect(
+                        context = context,
+                        ipAddress = ipAddress,
+                        port = port,
+                        symmetricKey = symmetricKey,
+                        onConnectionStatus = onConnectionStatus,
+                        onMessage = onMessage,
+                        manualAttempt = manualAttempt,
+                        onHandshakeTimeout = onHandshakeTimeout,
+                    )
+                }
             }
         }
     }
@@ -488,6 +529,7 @@ object WebSocketUtil {
                             context = context,
                             ipAddress = ip,
                             port = port,
+                            name = target.deviceName,
                             symmetricKey = target.symmetricKey,
                             manualAttempt = false,
                             onConnectionStatus = { connected ->

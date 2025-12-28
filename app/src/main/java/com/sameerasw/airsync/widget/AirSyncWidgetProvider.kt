@@ -76,6 +76,7 @@ class AirSyncWidgetProvider : AppWidgetProvider() {
                             context = context,
                             ipAddress = last.ipAddress,
                             port = last.port.toIntOrNull() ?: 6996,
+                            name = last.name,
                             symmetricKey = last.symmetricKey,
                             manualAttempt = true,
                             onConnectionStatus = { updateAllWidgets(context) },

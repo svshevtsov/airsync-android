@@ -366,6 +366,7 @@ class WakeupService : Service() {
                 context = this@WakeupService,
                 ipAddress = macIp,
                 port = macPort,
+                name = macName,
                 symmetricKey = encryptionKey,
                 manualAttempt = false, // This is an automated response to wake-up
                 onConnectionStatus = { connected ->

@@ -121,6 +121,7 @@ class AirSyncTileService : TileService() {
                     context = this@AirSyncTileService,
                     ipAddress = lastDevice.ipAddress,
                     port = lastDevice.port.toIntOrNull() ?: 6996,
+                    name = lastDevice.name,
                     symmetricKey = lastDevice.symmetricKey,
                     manualAttempt = true,
                     onHandshakeTimeout = {
