@@ -13,7 +13,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.sameerasw.airsync"
+        applicationId = "com.sameerasw.airsync.selfcompiled"
         minSdk = 30
         targetSdk = 36
         versionCode = 17
